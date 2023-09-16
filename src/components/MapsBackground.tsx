@@ -3,6 +3,8 @@ import { GoogleMap, LoadScript } from "@react-google-maps/api";
 import styled from "styled-components";
 import { Button, Card, Input, Select } from "@mantine/core";
 import { error } from "console";
+import { MDXMessage } from "./MDXMessage";
+import Loader from "./Loader";
 
 const exampleMapStyles = [
   {
@@ -292,7 +294,7 @@ const DialogBox = styled.div`
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  z-index: 1;
+  z-index: 2;
 `;
 
 const DialogInputContainer = styled.div``;
@@ -324,9 +326,11 @@ function isString(value: any): value is string {
 const sendMessage = async ({
   message,
   setResult,
+  setLoading,
 }: {
   message: string;
   setResult: React.Dispatch<React.SetStateAction<string>>;
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   const url =
     "https://api.fixie.ai/api/v1/agents/wross2/fixie-sidekick-template/conversations";
@@ -349,6 +353,7 @@ const sendMessage = async ({
     let done = false;
 
     while (!done) {
+      setLoading(true);
       const { value, done: isDone } = await reader.read();
       done = isDone;
       result += new TextDecoder().decode(value);
@@ -359,10 +364,13 @@ const sendMessage = async ({
           .messages?.at(-1)?.content;
         setResult(content ?? "");
       }
+      setLoading(false);
     }
   } catch (error) {
     console.log(error);
     setResult("");
+  } finally {
+    setLoading(false);
   }
 };
 
@@ -371,6 +379,7 @@ const MapComponent = () => {
   const [userPreferences, setUserPreferences] = useState<string>("");
   const [city, setCity] = useState<string | null>(null);
   const [result, setResult] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   // Function to get the user's location using Geolocation API
   const getUserLocation = ({ lat, lng }: Coordinates) => {
@@ -420,11 +429,12 @@ const MapComponent = () => {
     }
   }, [city, getUserLocation]);
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    sendMessage({
+    await sendMessage({
       message: systemMessageFormater(userPreferences, city ?? ""),
       setResult: setResult,
+      setLoading: setIsLoading,
     });
   };
 
@@ -473,9 +483,29 @@ const MapComponent = () => {
               setCity(value);
             }}
           />
-          <Button type="submit">Go!</Button>
+          <div style={{ display: "flex", justifyContent: "center" }}>
+            <DividerVerticalLine />
+          </div>
+          <div style={{ display: "flex", justifyContent: "center" }}>
+            <Button
+              type="submit"
+              radius="md"
+              variant="filled"
+              size="lg"
+              m={"10px"}
+              w="600px"
+              color="cyan"
+            >
+              Go!
+            </Button>
+          </div>
         </form>
-        <Card>{JSON.stringify(result, null, 2)}</Card>
+        <Card m="10px">
+          {/* <div style={{ display: "flex", justifyContent: "center" }}>
+            {isLoading && <Loader />}
+          </div> */}
+          <MDXMessage text={result} isLoading={isLoading} />
+        </Card>
       </DialogBox>
     </LoadScript>
   );
