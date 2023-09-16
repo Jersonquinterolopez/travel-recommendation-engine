@@ -286,7 +286,7 @@ const exampleMapStyles = [
 const DialogBox = styled.div`
   width: 45vw;
   height: auto;
-  background-color: #079898ba;
+  background-color: #a4a4a4ba;
   border-radius: 10px;
   position: absolute;
   top: 50%;
@@ -298,7 +298,9 @@ const DialogBox = styled.div`
 const DialogInputContainer = styled.div``;
 
 function Prompt() {
-  return <Input m={"10px"} icon={<IconSearch />} placeholder="Where to?" />;
+  return (
+    <Input size="lg" m={"10px"} icon={<IconSearch />} placeholder="Where to?" />
+  );
 }
 
 const MapComponent = () => {
