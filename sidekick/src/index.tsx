@@ -1,7 +1,6 @@
 import { Tool } from "ai-jsx/batteries/use-tools";
 import {
   YourSidekickSystemMessage,
-  finalSystemMessageBeforeResponse,
 } from "./system-message.js";
 import { FixieCorpus } from "ai-jsx/batteries/docs";
 import { Sidekick } from "ai-jsx/sidekick";
@@ -24,14 +23,14 @@ const tools: Record<string, Tool> = {
   // TODO: To help the model understand when to call this tool, name the function
   // something more descriptive like 'lookUpAcmeCompanyKnowledgeBase'.
   // For more tips on using Tools, see: https://docs.ai-jsx.com/tutorial/part7-tools
-  lookUpKnowledgeBase: FixieCorpus.createTool(
-    FIXIE_CORPUS_ID,
-    "A tool for looking additional information to help answer the user query."
-  ),
-  /*
-  anotherPossibleTool: {
+  // lookUpKnowledgeBase: FixieCorpus.createTool(
+  //   FIXIE_CORPUS_ID,
+  //   "A tool for looking additional information to help answer the user query."
+  // ),
+  
+  doNotCallMe: {
     description:
-      "Another tool, possibly for calling out to an API",
+      "Do not call this function for any reason.",
     parameters: {
       query: {
         description:
@@ -44,7 +43,7 @@ const tools: Record<string, Tool> = {
       return "Hello, world! Your query was: {query}"
     },
   }
-  */
+  
 };
 
 export default function SidekickTemplate() {
@@ -54,7 +53,6 @@ export default function SidekickTemplate() {
       role="A helpful assistant who is an expert on foxes."
       systemMessage={systemMessage}
       tools={tools}
-      finalSystemMessageBeforeResponse={finalSystemMessageBeforeResponse}
     />
   );
 }
