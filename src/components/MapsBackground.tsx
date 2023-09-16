@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { GoogleMap, LoadScript } from "@react-google-maps/api";
 import styled from "styled-components";
-import { Input } from "@mantine/core";
-import { IconSearch } from "@tabler/icons-react";
+import { Button, Card, Input, Select } from "@mantine/core";
+import { error } from "console";
 
 const exampleMapStyles = [
   {
@@ -297,18 +297,74 @@ const DialogBox = styled.div`
 
 const DialogInputContainer = styled.div``;
 
-function Prompt() {
-  return (
-    <Input size="lg" m={"10px"} icon={<IconSearch />} placeholder="Where to?" />
-  );
+const Logotype = styled.img`
+  width: 32px;
+`;
+
+function systemMessageFormater(userPreferences: string, city: string) {
+  return `=== PROMPT ${userPreferences} === ${city}`.trim();
 }
+
+const DividerVerticalLine = styled.div`
+  width: 245px;
+  height: 3px;
+  background-color: #00e1ff;
+`;
+
+interface Coordinates {
+  lat: number;
+  lng: number;
+}
+
+// write a typeguard for a string type
+function isString(value: any): value is string {
+  return typeof value === "string";
+}
+
+const sendMessage = async ({ message }: { message: string }) => {
+  const url =
+    "https://api.fixie.ai/api/v1/agents/wross2/fixie-sidekick-template/conversations";
+  const token =
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJmaXhpZS5haS9wcm9kIiwiYXVkIjoiaHR0cHM6Ly9maXhpZS5haSIsInN1YiI6IjY3In0.YB9geocdLubJEqQdnZHEOkBcHzyf7ZdlVF5Q9lemy0M";
+
+  const options = {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ message }),
+  };
+
+  try {
+    const response = await fetch(url, options);
+    const data = (await response.text()).split("\n").at(-2);
+    const messages = JSON.parse(data!).turns.at(-1).messages.at(-1).content;
+    console.log(messages);
+    return messages;
+  } catch (error) {
+    console.log(error);
+    return "";
+  }
+};
 
 const MapComponent = () => {
   const [mapCenter, setMapCenter] = useState({ lat: 0, lng: 0 });
+  const [userPreferences, setUserPreferences] = useState<string>("");
+  const [city, setCity] = useState<string | null>(null);
+  const [result, setResult] = useState<string>("");
 
   // Function to get the user's location using Geolocation API
-  const getUserLocation = () => {
-    if (navigator.geolocation) {
+  const getUserLocation = ({ lat, lng }: Coordinates) => {
+    if (city) {
+      navigator.geolocation.getCurrentPosition((position) => {
+        setMapCenter({
+          lat,
+          lng,
+        });
+      });
+    }
+    if (navigator.geolocation && !city) {
       navigator.geolocation.getCurrentPosition((position) => {
         setMapCenter({
           lat: position.coords.latitude,
@@ -320,9 +376,40 @@ const MapComponent = () => {
     }
   };
 
+  const getCityCoordinates = async (city: string): Promise<Coordinates> => {
+    try {
+      const response = await fetch(
+        `https://maps.googleapis.com/maps/api/geocode/json?address=${city}&key=${process.env.NEXT_PUBLIC_GOOGLE_API_KEY}`
+      );
+      const data = await response.json();
+      let coordinates = data.results[0].geometry.location;
+      return { lat: coordinates.lat, lng: coordinates.lng };
+    } catch (error) {
+      console.log(error);
+      return { lat: 0, lng: 0 };
+    }
+  };
+
   useEffect(() => {
-    getUserLocation();
+    getUserLocation({ lat: 0, lng: 0 });
   }, []);
+
+  useEffect(() => {
+    if (isString(city)) {
+      getCityCoordinates(city).then((cityCordinates) => {
+        getUserLocation({ lat: cityCordinates.lat, lng: cityCordinates.lng });
+      });
+    }
+  }, [city, getUserLocation]);
+
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    sendMessage({
+      message: systemMessageFormater(userPreferences, city ?? ""),
+    }).then((data) => {
+      setResult(data);
+    });
+  };
 
   return (
     <LoadScript googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_API_KEY ?? ""}>
@@ -339,7 +426,39 @@ const MapComponent = () => {
         {/* You can add markers, polygons, or other components here */}
       </GoogleMap>
       <DialogBox>
-        <Prompt />
+        <form onSubmit={handleSubmit}>
+          <Input
+            size="lg"
+            m={"10px"}
+            icon={<Logotype src="/travel.png" />}
+            placeholder="Where to?"
+            value={userPreferences}
+            onChange={(event) => {
+              setUserPreferences(event.currentTarget.value);
+            }}
+          />
+          <div style={{ display: "flex", justifyContent: "center" }}>
+            <DividerVerticalLine />
+          </div>
+          <Select
+            size="lg"
+            m={"10px"}
+            placeholder="City"
+            data={[
+              { label: "San Francisco", value: "San Francisco" },
+              { label: "New York", value: "New York" },
+              { label: "Los Angeles", value: "Los Angeles" },
+              { label: "Chicago", value: "Chicago" },
+              { label: "Seattle", value: "Seattle" },
+            ]}
+            value={city}
+            onChange={(value: string) => {
+              setCity(value);
+            }}
+          />
+          <Button type="submit">Go!</Button>
+        </form>
+        <Card>{JSON.stringify(result, null, 2)}</Card>
       </DialogBox>
     </LoadScript>
   );
