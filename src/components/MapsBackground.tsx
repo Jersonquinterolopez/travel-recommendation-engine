@@ -321,7 +321,13 @@ function isString(value: any): value is string {
   return typeof value === "string";
 }
 
-const sendMessage = async ({ message }: { message: string }) => {
+const sendMessage = async ({
+  message,
+  setResult,
+}: {
+  message: string;
+  setResult: React.Dispatch<React.SetStateAction<string>>;
+}) => {
   const url =
     "https://api.fixie.ai/api/v1/agents/wross2/fixie-sidekick-template/conversations";
   const token =
@@ -338,13 +344,25 @@ const sendMessage = async ({ message }: { message: string }) => {
 
   try {
     const response = await fetch(url, options);
-    const data = (await response.text()).split("\n").at(-2);
-    const messages = JSON.parse(data!).turns.at(-1).messages.at(-1).content;
-    console.log(messages);
-    return messages;
+    const reader = response!.body!.getReader();
+    let result = "";
+    let done = false;
+
+    while (!done) {
+      const { value, done: isDone } = await reader.read();
+      done = isDone;
+      result += new TextDecoder().decode(value);
+      const messages = result.split("\n").at(-2);
+      if (messages) {
+        const content = JSON.parse(messages)
+          .turns?.at(-1)
+          .messages?.at(-1)?.content;
+        setResult(content ?? "");
+      }
+    }
   } catch (error) {
     console.log(error);
-    return "";
+    setResult("");
   }
 };
 
@@ -406,8 +424,7 @@ const MapComponent = () => {
     event.preventDefault();
     sendMessage({
       message: systemMessageFormater(userPreferences, city ?? ""),
-    }).then((data) => {
-      setResult(data);
+      setResult: setResult,
     });
   };
 
