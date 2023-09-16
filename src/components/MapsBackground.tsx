@@ -323,7 +323,7 @@ const MapComponent = () => {
   }, []);
 
   return (
-    <LoadScript googleMapsApiKey="AIzaSyBFPM4OvvbXoUFGLx_NYH9pC6Wj-dq3uBE">
+    <LoadScript googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_API_KEY ?? ""}>
       <GoogleMap
         mapContainerStyle={{ width: "100%", height: "100vh" }}
         center={mapCenter}
