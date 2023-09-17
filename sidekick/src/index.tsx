@@ -1,5 +1,5 @@
 import { Tool } from "ai-jsx/batteries/use-tools";
-import { YourSidekickSystemMessage } from "./system-message.js";
+// import { YourSidekickSystemMessage } from "./system-message.js";
 import { Sidekick } from "ai-jsx/sidekick";
 
 const SEATTLE_CORPUS_ID: string = "71c7daa4-4c2c-4e3f-a41c-318f63677ad7";
@@ -14,7 +14,7 @@ const SAN_FRANCISCO_CORPUS_ID: string = "";
 //   throw new Error("Please set a FIXIE_CORPUS_ID in src/index.tsx");
 // }
 
-const systemMessage = <YourSidekickSystemMessage />;
+// const systemMessage = <YourSidekickSystemMessage />;
 
 const tools: Record<string, Tool> = {
   // TODO: To help the model understand when to call this tool, name the function
