@@ -4,7 +4,7 @@ import { Card, Flex, Input, Select } from "@mantine/core";
 import { MapStyles } from "@/utils/mapStyles";
 import Loader from "@/components/Loader";
 import { MDXMessage } from "@/components/MDXMessage";
-import useController from "./useController";
+import useController from "../../hooks/useController";
 import styled from "styled-components";
 
 export const DialogBox = styled.div`
