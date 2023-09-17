@@ -1,8 +1,5 @@
 import { Tool } from "ai-jsx/batteries/use-tools";
-import {
-  YourSidekickSystemMessage,
-} from "./system-message.js";
-import { FixieCorpus } from "ai-jsx/batteries/docs";
+import { YourSidekickSystemMessage } from "./system-message.js";
 import { Sidekick } from "ai-jsx/sidekick";
 
 const SEATTLE_CORPUS_ID: string = "71c7daa4-4c2c-4e3f-a41c-318f63677ad7";
@@ -29,32 +26,29 @@ const tools: Record<string, Tool> = {
   // ),
 
   // lookUpKnowledgeBaseNewYork
-  
+
   doNotCallMe: {
-    description:
-      "Do not call this function for any reason.",
+    description: "Do not call this function for any reason.",
     parameters: {
       query: {
-        description:
-          "A parameter for the tool",
+        description: "A parameter for the tool",
         type: "string",
         required: true,
       },
     },
     func: async ({ query }) => {
-      return "Hello, world! Your query was: {query}"
+      return "Hello, world! Your query was: {query}";
     },
-  }
-  
+  },
 };
 
-export default function SidekickTemplate() {
-  return (
-    <Sidekick
-      // TODO: Give the Sidekick a descriptive role like "A helpful assistant for Acme Company".
-      role="A helpful assistant who is an expert on foxes."
-      systemMessage={systemMessage}
-      tools={tools}
-    />
-  );
-}
+// export default function SidekickTemplate() {
+//   return (
+//     <Sidekick
+//       // TODO: Give the Sidekick a descriptive role like "A helpful assistant for Acme Company".
+//       role="A helpful assistant who is an expert on foxes."
+//       systemMessage={systemMessage}
+//       tools={tools}
+//     />
+//   );
+// }
