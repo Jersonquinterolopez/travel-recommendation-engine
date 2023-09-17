@@ -1,6 +1,7 @@
 import { AppProps } from "next/app";
 import Head from "next/head";
 import { MantineProvider } from "@mantine/core";
+import "../styles/global.css";
 
 export default function App(props: AppProps) {
   const { Component, pageProps } = props;
@@ -13,7 +14,6 @@ export default function App(props: AppProps) {
           name="viewport"
           content="minimum-scale=1, initial-scale=1, width=device-width"
         />
-        <script src="https://cdn.tailwindcss.com" />
       </Head>
 
       <MantineProvider
