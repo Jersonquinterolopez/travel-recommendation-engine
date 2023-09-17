@@ -11,7 +11,6 @@ interface CardProps {
 export function Card({
   header,
   children,
-  imageUrl,
   moreDetailUrl,
   moreDetailLabel,
 }: CardProps) {
@@ -20,14 +19,6 @@ export function Card({
       <div className="rounded-t-md bg-black px-4 py-3">
         <div className="flex flex-row justify-between">
           <div className="flex flex-row truncate text-white">
-            {/* {imageUrl && (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={imageUrl}
-                alt=""
-                className="my-0 mr-2 h-10 w-10 self-center rounded-full"
-              />
-            )} */}
             <div className="self-center font-bold">{header}</div>
           </div>
           {moreDetailUrl && moreDetailLabel && (

@@ -1,5 +1,9 @@
 import { Loader as MantineLoader } from "@mantine/core";
 
-export default function Loader() {
-  return <MantineLoader color="cyan" />;
+interface Props {
+  size?: "xs" | "sm" | "md" | "lg" | "xl" | number;
+}
+
+export default function Loader({ size }: Props) {
+  return <MantineLoader size={size} color="cyan" />;
 }
