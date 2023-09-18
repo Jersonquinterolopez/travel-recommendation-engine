@@ -31,11 +31,11 @@ export default async function handler(
           done = isDone;
           res.write(value ?? "");
         }
-        res.writeHead(200, "").end();
+        res.end();
       }
     } catch (error) {
       console.error(error);
-      res.writeHead(200, "");
+      res.status(500).json({ error: error });
     }
   } catch (error) {
     console.error(error);

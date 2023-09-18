@@ -23,7 +23,6 @@ async function sendPrompt({
     headers: {
       "Content-Type": "application/json",
       Accept: "application/json",
-      "Transfer-Encoding": "chunked",
     },
     body: JSON.stringify({ message }),
   };
